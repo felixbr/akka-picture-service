@@ -12,15 +12,14 @@ object ImageTransformer {
   implicit val writer = JpegWriter.NoCompression
 
   def resizeImageTo(imageData: Array[Byte], width: Int, height: Int): ProcessedImage = {
-    val convertedImage = Image(imageData).cover(width, height)
-    val convertedImageData = convertedImage.bytes
+    val transformedImage = Image(imageData).cover(width, height)
+    val transformedImageData = transformedImage.bytes
 
-    val imageFilePath = s"processed_images/${UUID.nameUUIDFromBytes(convertedImageData)}.jpg"
-
+    val imageFilePath = s"processed_images/${UUID.nameUUIDFromBytes(transformedImageData)}.jpg"
     val outputFile = new File(imageFilePath)
 
-    convertedImage.output(outputFile)
+    transformedImage.output(outputFile)
 
-    ProcessedImage(convertedImageData, imageFilePath)
+    ProcessedImage(transformedImageData, imageFilePath)
   }
 }

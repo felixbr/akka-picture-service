@@ -25,6 +25,7 @@ lazy val root = project.in(file("."))
       "com.sksamuel.scrimage" %% "scrimage-core" % scrimageVersion,
       "com.sksamuel.scrimage" %% "scrimage-io-extra" % scrimageVersion,
       "com.sksamuel.scrimage" %% "scrimage-filters" % scrimageVersion,
+      "com.lihaoyi" %% "ammonite-ops" % "0.5.7",
       "org.scalatest" %% "scalatest" % "2.2.6" % "test",
       "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion % "test"
     )
