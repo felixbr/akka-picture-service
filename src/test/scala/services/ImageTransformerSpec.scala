@@ -1,11 +1,11 @@
+package services
+
+import ammonite.ops._
 import com.sksamuel.scrimage.Image
-import helpers.FileHelper
 import org.scalatest._
-import services.{ImageTransformer, ServerActorSystem}
 
 class ImageTransformerSpec extends WordSpec with Matchers with ServerActorSystem {
-
-  val imageData = FileHelper.loadImageDataFromResources("/wallpaper.jpg")
+  val imageData = read.bytes(resource/"wallpaper.jpg")
 
   "The ImageTransformer" should {
     "resize an image to 1024x768" in {
