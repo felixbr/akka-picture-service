@@ -9,7 +9,7 @@ import scala.concurrent.Future
 
 object ImageUploader extends ServerActorSystem {
   def saveFileOnDisk(bytesSource: Source[ByteString, Any], fileName: FileName): Future[FileName] = {
-    val outFile = (Config.uploadedImagesDirectory/fileName).toIO
+    val outFile = (Config.directories.uploadedImages/fileName).toIO
     val sink = FileIO.toFile(outFile)
 
     bytesSource.runWith(sink).map(x => outFile.getName)

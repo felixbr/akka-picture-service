@@ -28,8 +28,8 @@ class ImageUploadSpec extends WordSpec with Matchers with ScalatestRouteTest {
       Post("/api/images", multipartForm) ~> apiRoute ~> check {
         status shouldEqual StatusCodes.Created
 
-        exists(Config.uploadedImagesDirectory/responseAs[FileName]) shouldEqual true
-        read.bytes(Config.uploadedImagesDirectory/responseAs[FileName]).size shouldEqual imageData.size
+        exists(Config.directories.uploadedImages/responseAs[FileName]) shouldEqual true
+        read.bytes(Config.directories.uploadedImages/responseAs[FileName]).size shouldEqual imageData.size
       }
     }
   }

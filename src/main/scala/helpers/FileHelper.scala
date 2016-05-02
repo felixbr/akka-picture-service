@@ -8,10 +8,10 @@ import scala.concurrent.Future
 
 object FileHelper extends ServerActorSystem {
   def loadImageDataFromUploads(fileName: FileName): Future[ImageData] = Future {
-    read.bytes(Config.uploadedImagesDirectory/fileName)
+    read.bytes(Config.directories.uploadedImages/fileName)
   }
 
   def loadImageDataFromProcessed(fileName: FileName): Future[ImageData] = Future {
-    read.bytes(Config.processedImagesDirectory/fileName)
+    read.bytes(Config.directories.processedImages/fileName)
   }
 }

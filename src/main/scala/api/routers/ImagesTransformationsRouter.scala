@@ -5,12 +5,14 @@ import java.nio.file.NoSuchFileException
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
+import models.responses._
+import formats.JsonFormats
 import helpers.FileHelper
 import services.{ImageTransformer, ServerActorSystem}
 
 import scala.util.{Failure, Success}
 
-object ImagesTransformationsRouter extends ServerActorSystem {
+object ImagesTransformationsRouter extends ServerActorSystem with JsonFormats {
   val routes: Route =
     get {
       pathPrefix(Segment) { fileName =>
@@ -26,11 +28,11 @@ object ImagesTransformationsRouter extends ServerActorSystem {
                     entity = HttpEntity(MediaTypes.`image/jpeg`, image.imageData)
                   ))
 
-                case Failure(e: NoSuchFileException) =>
-                  complete(HttpResponse(
-                    status = StatusCodes.NotFound,
-                    entity = s"Uploaded file '$fileName' not found"
-                  ))
+                case Failure(_: NoSuchFileException) =>
+                  complete((StatusCodes.NotFound, ErrorResponse(s"File '$fileName' not found")))
+
+                case Failure(e: IllegalArgumentException) =>
+                  complete((StatusCodes.BadRequest, ErrorResponse(e.getMessage)))
 
                 case Failure(e) => throw e
               }

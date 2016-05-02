@@ -1,4 +1,4 @@
-package api.responses
+package api
 
 import akka.http.scaladsl.model.{HttpResponse, StatusCodes}
 import akka.http.scaladsl.server.Directives._

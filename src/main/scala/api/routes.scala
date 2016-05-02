@@ -3,7 +3,7 @@ package api
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
-import api.responses.exceptionHandlers._
+import exceptionHandlers._
 import api.routers.ImagesRouter
 import services.ServerActorSystem
 

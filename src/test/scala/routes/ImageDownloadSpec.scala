@@ -16,7 +16,7 @@ class ImageDownloadSpec extends WordSpec with Matchers with ScalatestRouteTest {
   val imageData = read.bytes(resource/fileName)
 
   def setupUploadedImage(fileName: String): Unit = {
-    write.over(Config.uploadedImagesDirectory/fileName, imageData)
+    write.over(Config.directories.uploadedImages/fileName, imageData)
   }
 
   def haveContentEncoding(encoding: HttpEncoding): Matcher[HttpResponse] = {

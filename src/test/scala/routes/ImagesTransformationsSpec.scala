@@ -19,7 +19,7 @@ class ImagesTransformationsSpec extends WordSpec with Matchers with ScalatestRou
   val processedImageData = read.bytes(resource/processedFileName)
 
   def setupUploadedImage(fileName: String): Unit = {
-    write.over(Config.uploadedImagesDirectory/fileName, imageData)
+    write.over(Config.directories.uploadedImages/fileName, imageData)
   }
 
   implicit val routeTimeout = RouteTestTimeout(5.seconds)
@@ -35,6 +35,15 @@ class ImagesTransformationsSpec extends WordSpec with Matchers with ScalatestRou
           mediaType shouldEqual MediaTypes.`image/jpeg`
 
           responseAs[ImageData] shouldEqual processedImageData
+        }
+      }
+    }
+
+    "uploaded image with fileName doesn't exist" should {
+
+      "return 404 Not Found status" in {
+        Get("/api/images/doesnt_exist/resize/1024/768") ~> apiRoute ~> check {
+          status shouldEqual StatusCodes.NotFound
         }
       }
     }
