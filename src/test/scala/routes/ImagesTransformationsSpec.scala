@@ -1,8 +1,7 @@
 package routes
 
 import akka.http.scaladsl.model._
-import akka.http.scaladsl.model.headers._
-import akka.http.scaladsl.testkit.{RouteTestTimeout, ScalatestRouteTest}
+import akka.http.scaladsl.testkit._
 import ammonite.ops._
 import api.routes.apiRoute
 import helpers.Config
@@ -22,7 +21,7 @@ class ImagesTransformationsSpec extends WordSpec with Matchers with ScalatestRou
     write.over(Config.directories.uploadedImages/fileName, imageData)
   }
 
-  implicit val routeTimeout = RouteTestTimeout(5.seconds)
+  implicit val routeTimeout = RouteTestTimeout(10.seconds)
 
   "/api/images/{fileName}/resize/{width}/{height}" when {
 
