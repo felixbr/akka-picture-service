@@ -1,0 +1,74 @@
+swagger: "2.0"
+info:
+  title: Akka Picture Server API
+  version: 0.1
+consumes:
+- application/json
+basePath: /api
+paths:
+  /images:
+    post:
+      operationId: uploadNewImage
+      tags:
+      - Upload
+      summary: Upload a new image
+      description: Upload a new image
+      consumes:
+      - multipart/form-data
+      parameters:
+      - name: image
+        in: formData
+        type: file
+        description: The image file should be uploaded via multipart form data
+        required: true
+      responses:
+        "201":
+          description: Successful upload
+
+  /images/{fileName}/resize/{width}/{height}:
+    get:
+      operationId: resizeImage
+      tags:
+      - Transformations
+      summary: Download a resized image
+      description: Download a resized image
+      produces:
+      - image/jpeg
+      parameters:
+      - name: fileName
+        in: path
+        description: Name of the file to use for resizing
+        required: true
+        type: string
+      - name: width
+        in: path
+        description: Desired width of the downloaded image
+        required: true
+        type: integer
+      - name: height
+        in: path
+        description: Desired height of the downloaded image
+        required: true
+        type: integer
+      responses:
+        "200":
+          description: Successfully resized image download
+          schema:
+            type: file
+        "400":
+          description: Invalid value for width or height
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+        "404":
+          description: No image found with specified fileName
+          schema:
+            $ref: '#/definitions/ErrorResponse'
+
+definitions:
+  ErrorResponse:
+    type: object
+    required:
+    - error
+    properties:
+      error:
+        type: string

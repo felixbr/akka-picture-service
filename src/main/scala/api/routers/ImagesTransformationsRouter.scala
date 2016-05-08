@@ -13,6 +13,7 @@ import services.{ImageTransformer, ServerActorSystem}
 import scala.util.{Failure, Success}
 
 object ImagesTransformationsRouter extends ServerActorSystem with JsonFormats {
+
   val routes: Route =
     get {
       pathPrefix(Segment) { fileName =>

@@ -4,7 +4,7 @@ import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import exceptionHandlers._
-import api.routers.ImagesRouter
+import api.routers.{ImagesRouter, SwaggerRouter}
 import services.ServerActorSystem
 
 object routes extends ServerActorSystem {
@@ -13,9 +13,10 @@ object routes extends ServerActorSystem {
     encodeResponse {
       pathSingleSlash {
         get {
-          complete(HttpEntity(ContentTypes.`text/html(UTF-8)`, "<h1>Say hello to akka-http</h1>"))
+          redirect("/swagger", StatusCodes.TemporaryRedirect)
         }
       } ~
+      SwaggerRouter.routes ~
       pathPrefix("api") {
         handleExceptions(defaultHandler) {
           pathPrefix("images") {
