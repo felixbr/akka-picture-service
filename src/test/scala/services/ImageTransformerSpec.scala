@@ -1,5 +1,6 @@
 package services
 
+import actors.systems.ServerActorSystem
 import ammonite.ops._
 import com.sksamuel.scrimage.Image
 import helpers.Config

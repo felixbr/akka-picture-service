@@ -2,13 +2,14 @@ package api.routers
 
 import java.nio.file.NoSuchFileException
 
+import actors.systems.ServerActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import models.responses._
 import formats.JsonFormats
 import helpers.FileHelper
-import services.{ImageTransformer, ServerActorSystem}
+import services.ImageTransformer
 
 import scala.util.{Failure, Success}
 

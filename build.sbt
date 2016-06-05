@@ -28,6 +28,8 @@ lazy val root = project.in(file("."))
 
 cancelable in Global := true
 
+testOptions in Test += Tests.Argument("-oS")
+
 scalacOptions ++= Seq(
   "-deprecation",
   "-encoding", "UTF-8", // yes, this is 2 args

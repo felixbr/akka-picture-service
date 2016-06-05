@@ -1,10 +1,11 @@
 package api.routers
 
+import actors.systems.ServerActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
 import helpers.FileHelper
-import services.{ImageUploader, ServerActorSystem}
+import services.ImageUploader
 
 import scala.util.{Failure, Success}
 
