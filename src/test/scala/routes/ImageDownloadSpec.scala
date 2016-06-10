@@ -12,7 +12,7 @@ import org.scalatest._
 import org.scalatest.matchers.Matcher
 
 class ImageDownloadSpec extends WordSpec with Matchers with ScalatestRouteTest {
-  val fileName = "wallpaper.jpg"
+  val fileName = "black_mage_cat_100.jpg"
   val imageData = read.bytes(resource/fileName)
 
   def setupUploadedImage(fileName: String): Unit = {

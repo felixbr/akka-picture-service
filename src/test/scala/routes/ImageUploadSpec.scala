@@ -11,7 +11,7 @@ import models.core._
 import org.scalatest.{Matchers, WordSpec}
 
 class ImageUploadSpec extends WordSpec with Matchers with ScalatestRouteTest {
-  val imageData = read.bytes(resource/"wallpaper.jpg")
+  val imageData = read.bytes(resource/"black_mage_cat_100.jpg")
   val fileSource = Source(List(ByteString.fromArray(imageData)))
 
   val multipartForm =
@@ -19,7 +19,7 @@ class ImageUploadSpec extends WordSpec with Matchers with ScalatestRouteTest {
       Multipart.FormData.BodyPart(
         "image",
         HttpEntity(MediaTypes.`image/jpeg`, imageData.length.toLong, fileSource),
-        Map("fileName" -> "wallpaper.jpg")
+        Map("fileName" -> "black_mage_cat_100.jpg")
       )
     )
 
@@ -29,7 +29,7 @@ class ImageUploadSpec extends WordSpec with Matchers with ScalatestRouteTest {
         status shouldEqual StatusCodes.Created
 
         exists(Config.directories.uploadedImages/responseAs[FileName]) shouldEqual true
-        read.bytes(Config.directories.uploadedImages/responseAs[FileName]).size shouldEqual imageData.size
+        read.bytes(Config.directories.uploadedImages / responseAs[FileName]).length shouldEqual imageData.length
       }
     }
   }

@@ -14,7 +14,7 @@ import services.ProcessedImage
 import scala.concurrent.duration._
 
 trait TestImageFixture {
-  val fileName = "black_mage_cat.jpg"
+  val fileName = "black_mage_cat_100.jpg"
   val imageData = read.bytes(resource/fileName)
 }
 
@@ -63,7 +63,7 @@ class WorkManagerSpec(_system: ActorSystem) extends TestKit(_system)
         val workState = WorkState.empty.updated(WorkAccepted(work))
 
         "accept the register and send work ready" in new WorkManagerFixture(workState) with TestImageFixture {
-          workManager ! messages.NewWork(imageData, operations.Resize(100, 100))
+          workManager ! messages.NewWork(operations.Resize(imageData, 50, 50))
           expectMsgPF(3.seconds) { case answers.NewWorkAck(_) => }
 
           workManager ! messages.RegisterWorker(workerId)

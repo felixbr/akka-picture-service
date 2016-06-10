@@ -4,6 +4,8 @@ val akkaVersion = "2.4.3"
 
 val scrimageVersion = "2.1.0"
 
+val ammoniteVersion = "0.6.0"
+
 val commonSettings = Seq(
   name := "akka-picture-service",
   version := "0.1",
@@ -20,11 +22,14 @@ lazy val root = project.in(file("."))
       "com.sksamuel.scrimage" %% "scrimage-core" % scrimageVersion,
       "com.sksamuel.scrimage" %% "scrimage-io-extra" % scrimageVersion,
       "com.sksamuel.scrimage" %% "scrimage-filters" % scrimageVersion,
-      "com.lihaoyi" %% "ammonite-ops" % "0.5.7",
+      "com.lihaoyi" %% "ammonite-ops" % ammoniteVersion,
       "org.scalatest" %% "scalatest" % "2.2.6" % "test",
-      "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion % "test"
+      "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion % "test",
+      "com.lihaoyi" % "ammonite-repl" % ammoniteVersion % "test" cross CrossVersion.full
     )
   )
+
+initialCommands in (Test, console) := """ammonite.repl.Main().run()"""
 
 cancelable in Global := true
 

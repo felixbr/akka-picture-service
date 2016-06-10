@@ -12,9 +12,9 @@ import org.scalatest.tagobjects.Slow
 import scala.concurrent.duration._
 
 class ImagesTransformationsSpec extends WordSpec with Matchers with ScalatestRouteTest {
-  val fileName = "wallpaper.jpg"
+  val fileName = "black_mage_cat_100.jpg"
   val imageData = read.bytes(resource/fileName)
-  val processedFileName = "wallpaper_resized.jpg"
+  val processedFileName = "black_mage_cat_50.jpg"
   val processedImageData = read.bytes(resource/processedFileName)
 
   def setupUploadedImage(fileName: String): Unit = {
@@ -29,7 +29,7 @@ class ImagesTransformationsSpec extends WordSpec with Matchers with ScalatestRou
       setupUploadedImage(fileName)
 
       "return a correct image response" taggedAs Slow in {
-        Get(s"/api/images/$fileName/resize/1024/768") ~> apiRoute ~> check {
+        Get(s"/api/images/$fileName/resize/50/50") ~> apiRoute ~> check {
           status shouldEqual StatusCodes.OK
           mediaType shouldEqual MediaTypes.`image/jpeg`
 
@@ -41,7 +41,7 @@ class ImagesTransformationsSpec extends WordSpec with Matchers with ScalatestRou
     "uploaded image with fileName doesn't exist" should {
 
       "return 404 Not Found status" in {
-        Get("/api/images/doesnt_exist/resize/1024/768") ~> apiRoute ~> check {
+        Get("/api/images/doesnt_exist/resize/50/50") ~> apiRoute ~> check {
           status shouldEqual StatusCodes.NotFound
         }
       }

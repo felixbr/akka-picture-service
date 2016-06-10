@@ -4,13 +4,9 @@ import actors.WorkManager._
 import actors.WorkManager.answers._
 import actors.WorkManager.messages._
 import akka.actor._
-import models.core._
-import java.util.UUID
-
 import models.WorkState
 import models.WorkState.{WorkAccepted, WorkCompleted, WorkStarted, WorkerFailed}
-import models.operations.WorkOperation
-import services.ProcessedImage
+import models.core._
 
 import scala.concurrent.duration._
 
@@ -22,18 +18,12 @@ object WorkManager {
   case class WorkerBusy(assignedWork: WorkId, deadline: Deadline) extends WorkerStatus
   case class WorkerState(ref: ActorRef, status: WorkerStatus)
 
-  def workIdForNewWork(newWork: NewWork) = {
-    val dataString = UUID.nameUUIDFromBytes(newWork.imageDate).toString
-
-    WorkId(s"$dataString|${newWork.operation.hashCode().toString}")
-  }
-
   object messages {
-    case class NewWork(imageDate: ImageData, operation: WorkOperation)
+    case class NewWork[Payload](payload: Payload)
 
     case class RegisterWorker(workerId: WorkerId)
     case class RequestWork(workerId: WorkerId)
-    case class WorkIsDone(workerId: WorkerId, workId: WorkId, result: ProcessedImage)
+    case class WorkIsDone[Result](workerId: WorkerId, workId: WorkId, result: Result)
     case class WorkFailed(workerId: WorkerId, workId: WorkId)
   }
 
@@ -70,9 +60,9 @@ class WorkManager(
       }
 
     case RequestWork(workerId) =>
-      log.info(s"RECEIVED RequestWork from ${workerId.value}")
+      log.debug(s"RECEIVED RequestWork from ${workerId.value}")
       if (workState.hasWork) {
-        log.info("HAS WORK")
+        log.debug("HAS WORK")
         workers.get(workerId) match {
           case Some(s @ WorkerState(_, WorkerIdle)) =>
             val work = workState.nextWork
@@ -81,14 +71,13 @@ class WorkManager(
             workers += (workerId -> s.copy(status = WorkerBusy(work.workId, Deadline.now + workTimeout)))
             sender() ! work
           case s =>
-            log.info(s.toString)
+            log.debug(s"Worker ${workerId.value} not found in registered workers")
         }
       } else {
-        log.info(s"NO WORK")
+        log.debug(s"NO WORK")
       }
 
     case WorkIsDone(workerId, workId, result) =>
-      println(workState)
       // idempotent
       if (workState.isDone(workId)) {
         log.info(s"Resending WorkIsDoneAck: ${workId.value}")
@@ -99,6 +88,7 @@ class WorkManager(
         log.info(s"Work ${workId.value} was done by worker ${workerId.value}")
         changeWorkerToIdle(workerId, workId)
         workState = workState.updated(WorkCompleted(workId, result))
+        log.debug(s"WorkIsDone result for ${workId.value}: $result")
         // TODO publish result via PubSub
         sender() ! WorkIsDoneAck(workId)
       }
@@ -109,10 +99,11 @@ class WorkManager(
         changeWorkerToIdle(workerId, workId)
         workState = workState.updated(WorkerFailed(workId))
         // TODO notifyWorkers()
+        notifyWorkersAboutWorkReady()
       }
 
-    case w @ NewWork(imageDate, operation) =>
-      val workId = workIdForNewWork(w)
+    case NewWork(payload) =>
+      val workId = WorkId(payload.hashCode().toString)
 
       // idempotent
       if (workState.isAccepted(workId)) {
@@ -120,10 +111,13 @@ class WorkManager(
         sender() ! NewWorkAck(workId)
       } else {
         log.info(s"Accepted work: ${workId.value}")
-        workState = workState.updated(WorkAccepted(Work(workId, w)))
+        workState = workState.updated(WorkAccepted(Work(workId, payload)))
         sender() ! NewWorkAck(workId)
         // TODO notify workers
+        notifyWorkersAboutWorkReady()
       }
+
+    // TODO clean up timeouts + retry
 
     case x =>
       throw new Exception(s"Unrecognized message: $x")
@@ -132,7 +126,7 @@ class WorkManager(
   def notifyWorkersAboutWorkReady(): Unit = {
     if (workState.hasWork) {
       workers.foreach {
-        case (_, WorkerState(ref, idle)) =>
+        case (_, WorkerState(ref, WorkerIdle)) =>
           ref ! WorkIsReady
         case _ =>
           // busy, don't bother
