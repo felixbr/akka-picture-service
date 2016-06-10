@@ -1,22 +1,16 @@
 package actors
 
 import actors.WorkManager._
-import actors.systems.WorkerActorSystem
-import akka.actor.{Actor, ActorRef, ActorSystem, Props}
+import akka.actor.{ActorSystem, Props}
 import akka.testkit.{ImplicitSender, TestActorRef, TestKit}
-import ammonite.ops._
 import models.WorkState._
 import models.core._
 import models.{WorkState, operations}
 import org.scalatest._
 import services.ProcessedImage
+import testutil.fixtures._
 
 import scala.concurrent.duration._
-
-trait TestImageFixture {
-  val fileName = "black_mage_cat_100.jpg"
-  val imageData = read.bytes(resource/fileName)
-}
 
 class WorkManagerFixture(
   initialState: WorkState = WorkState.empty,
@@ -28,13 +22,11 @@ class WorkManagerFixture(
   val underlyingActor: WorkManager = workManager.underlyingActor
 }
 
-object WorkManagerSpec extends WorkerActorSystem
-
 class WorkManagerSpec(_system: ActorSystem) extends TestKit(_system)
   with ImplicitSender with WordSpecLike with Matchers
   with BeforeAndAfterEach with BeforeAndAfterAll {
 
-  def this() = this(WorkManagerSpec.system)
+  def this() = this(ActorSystem("WorkManagerSpec-system"))
 
   implicit val workerId = WorkerId("123")
 
@@ -43,6 +35,7 @@ class WorkManagerSpec(_system: ActorSystem) extends TestKit(_system)
     workerManager ! messages.RegisterWorker(workerId)
 
     testCode
+    ignoreMsg { case _ => false }
   }
 
   override def afterAll = {

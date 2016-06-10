@@ -9,9 +9,9 @@ import api.routes.apiRoute
 import helpers.Config
 import models.core._
 import org.scalatest.{Matchers, WordSpec}
+import testutil.fixtures.TestImageFixture
 
-class ImageUploadSpec extends WordSpec with Matchers with ScalatestRouteTest {
-  val imageData = read.bytes(resource/"black_mage_cat_100.jpg")
+trait MultipartFormFixture extends TestImageFixture {
   val fileSource = Source(List(ByteString.fromArray(imageData)))
 
   val multipartForm =
@@ -22,9 +22,12 @@ class ImageUploadSpec extends WordSpec with Matchers with ScalatestRouteTest {
         Map("fileName" -> "black_mage_cat_100.jpg")
       )
     )
+}
+
+class ImageUploadSpec extends WordSpec with Matchers with ScalatestRouteTest {
 
   "The ImageUpload" should {
-    "succeed" in {
+    "succeed" in new MultipartFormFixture {
       Post("/api/images", multipartForm) ~> apiRoute ~> check {
         status shouldEqual StatusCodes.Created
 

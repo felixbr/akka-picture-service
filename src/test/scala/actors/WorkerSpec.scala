@@ -1,7 +1,6 @@
 package actors
 
 import actors.WorkManager.messages.{RegisterWorker, WorkIsDone}
-import actors.systems.WorkerActorSystem
 import akka.actor._
 import akka.testkit._
 import ammonite.ops._
@@ -12,13 +11,10 @@ import services.ProcessedImage
 
 import scala.concurrent.duration._
 
-object WorkerSpec extends WorkerActorSystem
-
 class WorkerSpec(_system: ActorSystem) extends TestKit(_system)
   with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
 
-
-  def this() = this(WorkerSpec.system)
+  def this() = this(ActorSystem())
 
   val fileName = "black_mage_cat_100.jpg"
   val imageData = read.bytes(resource/fileName)
