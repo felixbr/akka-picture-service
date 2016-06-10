@@ -25,14 +25,13 @@ object BackgroundProcessing extends WorkerActorSystem {
 }
 
 object Server extends App with ServerActorSystem {
+  import BackgroundProcessing.{workManager, startWorkers, stopWorkers}
 
   val bindingFuture = Http().bindAndHandle(apiRoute, "localhost", 3000)
 
-  import BackgroundProcessing.{workManager, startWorkers, stopWorkers}
   startWorkers()
 
   val imageData = read.bytes(resource/"black_mage_cat_100.jpg")
-
   workManager ! WorkManager.messages.NewWork(operations.Resize(imageData, 50, 50))
 
   println(s"Server online at http://localhost:3000/\nPress RETURN to stop...")
