@@ -139,9 +139,9 @@ class WorkManager(
 
   def changeWorkerToIdle(workerId: WorkerId, workId: WorkId): Unit = {
     workers.get(workerId) match {
-      case Some(s @ WorkerState(_, WorkerBusy(`workId`, _))) ⇒
+      case Some(s @ WorkerState(_, WorkerBusy(`workId`, _))) =>
         workers += (workerId -> s.copy(status = WorkerIdle))
-      case _ ⇒
+      case _ =>
         // ok, might happen after standby recovery, worker state is not persisted
     }
   }
