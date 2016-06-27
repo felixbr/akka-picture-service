@@ -59,7 +59,7 @@ class Worker(val workManager: ActorRef, val registerInterval: FiniteDuration)
 
   def working: Receive = {
     case WorkCompleted(result: ProcessedImage) =>
-      log.info(s"Work ${currentWorkId} is complete. Result: $result")
+      log.info(s"Work $currentWorkId is complete. Result: $result")
       sendToWorkManager(WorkIsDone(workerId, currentWorkId, result))
       context.setReceiveTimeout(5.seconds)
       context.become(waitForWorkIsDoneAck(result))
