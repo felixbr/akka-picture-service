@@ -2,7 +2,6 @@ package api.routers
 
 import java.nio.file.NoSuchFileException
 
-import actors.systems.ServerActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
@@ -13,7 +12,9 @@ import services.ImageTransformer
 
 import scala.util.{Failure, Success}
 
-object ImagesTransformationsRouter extends ServerActorSystem with JsonFormats {
+import scala.concurrent.ExecutionContext.Implicits.global
+
+object ImagesTransformationsRouter extends JsonFormats {
 
   val routes: Route =
     get {

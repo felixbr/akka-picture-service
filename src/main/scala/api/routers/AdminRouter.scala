@@ -9,5 +9,8 @@ object AdminRouter extends ServerActorSystem {
   val routes: Route =
     path("ws") {
       handleWebSocketMessages(admin.live.wsHandlerFlow)
+    } ~
+    pathEndOrSingleSlash {
+      getFromFile("web/index.html")
     }
 }
