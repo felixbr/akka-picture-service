@@ -23,11 +23,12 @@ object WorkState {
 
 }
 
-case class WorkState private (
-  private val pendingWork: Queue[Work[_]],
-  private val workInProgress: Map[WorkId, Work[_]],
-  private val acceptedWorkIds: Set[WorkId],
-  private val doneWorkIds: Set[WorkId]) {
+case class WorkState (
+  pendingWork: Queue[Work[_]],
+  workInProgress: Map[WorkId, Work[_]],
+  acceptedWorkIds: Set[WorkId],
+  doneWorkIds: Set[WorkId]
+) {
 
   import WorkState._
 
@@ -75,6 +76,6 @@ case class WorkState private (
        |  acceptedWorkIds: $acceptedWorkIds
        |  doneWorkIds:     $doneWorkIds
        |)
-     """.stripMargin
+     """.stripMargin.trim
   }
 }

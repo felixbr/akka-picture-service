@@ -1,17 +1,16 @@
 package api
 
 import actors.systems.{ServerActorSystem, WorkerActorSystem}
-import actors.{WorkManager, Worker}
+import actors.{WorkManager, WorkManagerMonitor, WorkSpammerActor, Worker}
 import akka.http.scaladsl.Http
-import ammonite.ops._
 import api.routes._
-import models.operations
 
 import scala.io.StdIn
-import scala.language.dynamics
 
 object BackgroundProcessing extends WorkerActorSystem {
-  val workManager = system.actorOf(WorkManager.props)
+  val workManagerMonitor = system.actorOf(WorkManagerMonitor.props)
+
+  val workManager = system.actorOf(WorkManager.props(monitor = Some(workManagerMonitor)))
 
   def startWorkers() = {
     (1 to 5).foreach { n =>
@@ -22,25 +21,25 @@ object BackgroundProcessing extends WorkerActorSystem {
   def stopWorkers() = {
     system.terminate()
   }
+
+  def startWorkSpam() = {
+    system.actorOf(WorkSpammerActor.props(workManager))
+  }
 }
 
 object Server extends App with ServerActorSystem {
-  import BackgroundProcessing.{workManager, startWorkers, stopWorkers}
+  import BackgroundProcessing.{startWorkers, stopWorkers, startWorkSpam}
 
   val bindingFuture = Http().bindAndHandle(apiRoute, "localhost", 3000)
 
   startWorkers()
-
-  val imageData = read.bytes(resource/"black_mage_cat_100.jpg")
-  workManager ! WorkManager.messages.NewWork(operations.Resize(imageData, 50, 50))
+  startWorkSpam()
 
   println(s"Server online at http://localhost:3000/\nPress RETURN to stop...")
   StdIn.readLine() // let it run until user presses return
   bindingFuture
-    .flatMap(_.unbind()) // trigger unbinding from the port
-    .onComplete { _ =>   // and shutdown when done
-      stopWorkers()
-      system.terminate()
-    }
+    .flatMap(_.unbind())                  // trigger unbinding from the port
+    .flatMap(_ => stopWorkers())          // shutdown worker system
+    .onComplete(_ => system.terminate())  // and shutdown when done
 
 }

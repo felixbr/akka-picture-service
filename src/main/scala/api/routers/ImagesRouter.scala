@@ -1,6 +1,5 @@
 package api.routers
 
-import actors.systems.ServerActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
@@ -9,7 +8,7 @@ import services.ImageUploader
 
 import scala.util.{Failure, Success}
 
-object ImagesRouter extends ServerActorSystem {
+object ImagesRouter {
 
   val routes: Route =
     pathEndOrSingleSlash {

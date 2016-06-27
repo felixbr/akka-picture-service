@@ -17,12 +17,15 @@ lazy val root = project.in(file("."))
   .settings(
     libraryDependencies ++= Seq(
       "com.typesafe.akka" %% "akka-http-core" % akkaVersion,
+      "com.typesafe.akka" %% "akka-cluster" % akkaVersion,
+      "com.typesafe.akka" %% "akka-cluster-tools" % akkaVersion,
       "com.typesafe.akka" %% "akka-http-experimental" % akkaVersion,
       "com.typesafe.akka" %% "akka-http-spray-json-experimental" % akkaVersion,
       "com.sksamuel.scrimage" %% "scrimage-core" % scrimageVersion,
       "com.sksamuel.scrimage" %% "scrimage-io-extra" % scrimageVersion,
       "com.sksamuel.scrimage" %% "scrimage-filters" % scrimageVersion,
       "com.lihaoyi" %% "ammonite-ops" % ammoniteVersion,
+      "com.lihaoyi" %% "upickle" % "0.4.1",
       "org.scalatest" %% "scalatest" % "2.2.6" % "test",
       "com.typesafe.akka" %% "akka-http-testkit" % akkaVersion % "test",
       "com.lihaoyi" % "ammonite-repl" % ammoniteVersion % "test" cross CrossVersion.full
@@ -34,6 +37,10 @@ initialCommands in (Test, console) := """ammonite.repl.Main().run()"""
 cancelable in Global := true
 
 testOptions in Test += Tests.Argument("-oS")
+
+fork in Test := true
+
+javaOptions in Test += "-Dconfig.resource=application.test.conf"
 
 scalacOptions ++= Seq(
   "-deprecation",

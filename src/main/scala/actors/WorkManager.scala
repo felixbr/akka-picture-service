@@ -11,7 +11,9 @@ import models.core._
 import scala.concurrent.duration._
 
 object WorkManager {
-  def props = Props(new WorkManager(10.seconds))
+  def props(monitor: Option[ActorRef]) = {
+    Props(new WorkManager(10.seconds, monitor = monitor))
+  }
 
   sealed trait WorkerStatus
   case object WorkerIdle extends WorkerStatus
@@ -38,8 +40,9 @@ object WorkManager {
 class WorkManager(
   workTimeout: FiniteDuration,
   initialState: WorkState = WorkState.empty,
-  initialWorkers: Map[WorkerId, WorkerState] = Map.empty
-) extends Actor with ActorLogging {
+  initialWorkers: Map[WorkerId, WorkerState] = Map.empty,
+  val monitor: Option[ActorRef]
+) extends Actor with ActorLogging with WorkManagerMonitoring {
 
   var workState = initialState  // only prepopulated in tests
   var workers = initialWorkers  // only prepopulated in tests
@@ -98,7 +101,7 @@ class WorkManager(
         log.info(s"Work ${workId.value} failed by worker ${workerId.value}")
         changeWorkerToIdle(workerId, workId)
         workState = workState.updated(WorkerFailed(workId))
-        // TODO notifyWorkers()
+        // TODO test case notify workers
         notifyWorkersAboutWorkReady()
       }
 
@@ -113,7 +116,7 @@ class WorkManager(
         log.info(s"Accepted work: ${workId.value}")
         workState = workState.updated(WorkAccepted(Work(workId, payload)))
         sender() ! NewWorkAck(workId)
-        // TODO notify workers
+        // TODO test case notify workers
         notifyWorkersAboutWorkReady()
       }
 
@@ -141,5 +144,22 @@ class WorkManager(
       case _ ⇒
         // ok, might happen after standby recovery, worker state is not persisted
     }
+  }
+}
+
+trait WorkManagerMonitoring { self: WorkManager with Actor =>
+  def monitor: Option[ActorRef]
+
+  context.system.scheduler.schedule(
+    initialDelay = 1.seconds,
+    interval = 1.seconds,
+    new Runnable {
+      override def run(): Unit = sendMonitoringUpdate()
+    }
+  )(context.dispatcher)
+
+  def sendMonitoringUpdate(): Unit = {
+    monitor.foreach(_ ! WorkManagerMonitor.messages.WorkStateUpdate(workState))
+    monitor.foreach(_ ! WorkManagerMonitor.messages.WorkersUpdate(workers))
   }
 }

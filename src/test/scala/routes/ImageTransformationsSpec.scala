@@ -2,9 +2,7 @@ package routes
 
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.testkit._
-import ammonite.ops._
 import api.routes.apiRoute
-import helpers.Config
 import models.core._
 import org.scalatest._
 import org.scalatest.tagobjects.Slow

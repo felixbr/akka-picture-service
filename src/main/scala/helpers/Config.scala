@@ -4,8 +4,9 @@ import ammonite.ops._
 import com.typesafe.config.ConfigFactory
 
 object Config {
-  val defaultConfig = ConfigFactory.load("application.default.conf")
-  val config = ConfigFactory.load().withFallback(defaultConfig)
+  val config = ConfigFactory.load()
+
+  val env = config.getString("app.env")
 
   object directories {
     val processedImages = makePath(config.getString("app.directories.processedImages"))

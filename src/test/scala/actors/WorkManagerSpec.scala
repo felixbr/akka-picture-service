@@ -17,7 +17,7 @@ class WorkManagerFixture(
   initialWorkers: Map[WorkerId, WorkerState] = Map.empty
 )(implicit system: ActorSystem) {
 
-  val props = Props(new WorkManager(10.seconds, initialState, initialWorkers))
+  val props = Props(new WorkManager(10.seconds, initialState, initialWorkers, monitor = None))
   val workManager = TestActorRef[WorkManager](props)
   val underlyingActor: WorkManager = workManager.underlyingActor
 }
