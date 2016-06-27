@@ -1,13 +1,12 @@
 package api
 
-import actors.systems.ServerActorSystem
 import akka.http.scaladsl.model._
 import akka.http.scaladsl.server.Directives._
 import akka.http.scaladsl.server._
-import exceptionHandlers._
-import api.routers.{ImagesRouter, SwaggerRouter}
+import api.exceptionHandlers._
+import api.routers.{AdminRouter, ImagesRouter, SwaggerRouter}
 
-object routes extends ServerActorSystem {
+object routes {
 
   val apiRoute: Route =
     encodeResponse {
@@ -23,6 +22,9 @@ object routes extends ServerActorSystem {
             ImagesRouter.routes
           }
         }
+      } ~
+      pathPrefix("admin") {
+        AdminRouter.routes
       }
     }
 }
