@@ -26,7 +26,7 @@ object Config {
     try {
       Path(configPath)
     } catch {
-      case _: IllegalArgumentException => cwd/configPath
+      case _: IllegalArgumentException => cwd/configPath  // retry as relative path
     }
   }
 }

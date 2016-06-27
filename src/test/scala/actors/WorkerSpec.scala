@@ -8,6 +8,7 @@ import models.core._
 import models.operations
 import org.scalatest._
 import services.ProcessedImage
+import testutil.fixtures._
 
 import scala.concurrent.duration._
 
@@ -15,9 +16,6 @@ class WorkerSpec(_system: ActorSystem) extends TestKit(_system)
   with ImplicitSender with WordSpecLike with Matchers with BeforeAndAfterAll {
 
   def this() = this(ActorSystem())
-
-  val fileName = "black_mage_cat_100.jpg"
-  val imageData = read.bytes(resource/fileName)
 
   override def afterAll = {
     TestKit.shutdownActorSystem(system)
@@ -30,7 +28,7 @@ class WorkerSpec(_system: ActorSystem) extends TestKit(_system)
 
   "A worker actor" when {
     "receiving work" must {
-      "respond with processed image" in {
+      "respond with processed image" in new TestImageFixture {
         worker ! Work(workId, operations.Resize(imageData, 100, 100))
         expectMsgPF(3.seconds) {
           case WorkIsDone(_, `workId`, _: ProcessedImage) =>

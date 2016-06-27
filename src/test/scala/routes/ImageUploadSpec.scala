@@ -32,7 +32,7 @@ class ImageUploadSpec extends WordSpec with Matchers with ScalatestRouteTest {
         status shouldEqual StatusCodes.Created
 
         exists(Config.directories.uploadedImages/responseAs[FileName]) shouldEqual true
-        read.bytes(Config.directories.uploadedImages / responseAs[FileName]).length shouldEqual imageData.length
+        read.bytes(Config.directories.uploadedImages/responseAs[FileName]).length shouldEqual imageData.length
       }
     }
   }

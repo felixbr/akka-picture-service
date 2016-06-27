@@ -141,7 +141,7 @@ class WorkManagerSpec(_system: ActorSystem) extends TestKit(_system)
     }
 
     "the queue has space" should {
-      "accept work and ack" in new WorkManagerFixture with TestImageFixture {
+      "accept work and ack" ignore new WorkManagerFixture with TestImageFixture {
         withRegisteredWorker(workManager) {
 
         }
